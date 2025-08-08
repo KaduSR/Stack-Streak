@@ -1,5 +1,5 @@
 
-<h1 align="center">🚀 Stack Streak</h1>
+<h1 align="center">🚀 Study Streak</h1>
 
 <p align="center">
   Aplicativo pessoal para explorar do desenvolvimento front-end, utilizando <strong>React Native</strong> e <strong>Expo</strong>.
