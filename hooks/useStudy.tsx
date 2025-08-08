@@ -1,5 +1,5 @@
-import { StudyContext } from "@/contexts/StudyContext";
 import { useContext } from "react";
+import { StudyContext } from "@/contexts/StudyContext";
 
 export function useStudy() {
   const context = useContext(StudyContext);

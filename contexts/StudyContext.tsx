@@ -1,6 +1,6 @@
-import { useAuth } from "@/hooks/useAuth";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/services/supabase";
-import React, { createContext, ReactNode, useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface StudyStats {
   currentStreak: number;
@@ -64,6 +64,43 @@ export function StudyProvider({ children }: { children: ReactNode }) {
         .eq("user_id", user.id)
         .single();
 
+      // Verificar se a ofensiva deve ser resetada automaticamente
+      let currentStreak = streakData?.current_streak || 0;
+      const lastStudyDate = streakData?.last_study_date;
+
+      if (lastStudyDate && currentStreak > 0) {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        const lastDate = new Date(lastStudyDate + "T00:00:00");
+        const yesterdayString = yesterday.toISOString().split("T")[0];
+
+        // Se o último estudo não foi ontem e a streak é maior que 0, resetar
+        if (
+          lastDate.toISOString().split("T")[0] !== yesterdayString &&
+          lastDate.toISOString().split("T")[0] !==
+            today.toISOString().split("T")[0]
+        ) {
+          console.log(
+            "🔥 Ofensiva resetada automaticamente - última data:",
+            lastStudyDate
+          );
+
+          // Resetar streak no banco
+          await supabase
+            .from("user_streaks")
+            .update({
+              current_streak: 0,
+              last_study_date: null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("user_id", user.id);
+
+          currentStreak = 0;
+        }
+      }
+
       // Buscar registros de estudo desta semana
       const today = new Date();
       const startOfWeek = new Date(today);
@@ -103,10 +140,11 @@ export function StudyProvider({ children }: { children: ReactNode }) {
       }
 
       const currentStats: StudyStats = {
-        currentStreak: streakData?.current_streak || 0,
+        currentStreak: currentStreak,
         longestStreak: streakData?.longest_streak || 0,
         totalStudyDays: streakData?.total_study_days || 0,
-        lastStudyDate: streakData?.last_study_date || null,
+        lastStudyDate:
+          currentStreak > 0 ? streakData?.last_study_date || null : null,
         todayCompleted,
         weeklyProgress,
       };

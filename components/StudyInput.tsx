@@ -16,7 +16,7 @@ export default function StudyInput() {
             <Text style={styles.title}>O que você estudou hoje</Text>
           </View>
 
-          <Text style={styles.completedText}>"{todayStudyContent}"</Text>
+          <Text style={styles.completedText}>&ldquo;{todayStudyContent}&rdquo;</Text>
 
           <View style={styles.successContainer}>
             <MaterialIcons name="check-circle" size={20} color="#58CC02" />

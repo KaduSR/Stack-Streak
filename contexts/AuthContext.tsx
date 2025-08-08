@@ -2,6 +2,11 @@ import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/services/supabase";
 import { Alert, Platform } from "react-native";
+import * as WebBrowser from "expo-web-browser";
+import * as Linking from "expo-linking";
+
+// Configure WebBrowser for OAuth
+WebBrowser.maybeCompleteAuthSession();
 
 export interface UserProfile {
   id: string;
@@ -46,6 +51,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // URL do redirecionamento baseado na plataforma
+  const getRedirectUrl = () => {
+    if (Platform.OS === "web") {
+      return `${window.location.origin}/auth/callback`;
+    } else {
+      return Linking.createURL("/auth/callback");
+    }
+  };
+
   // Buscar perfil do usuário
   const fetchProfile = async (userId: string) => {
     try {
@@ -66,6 +80,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Configurar deep linking para mobile
+  useEffect(() => {
+    if (Platform.OS !== "web") {
+      const handleDeepLink = (url: string) => {
+        console.log("Deep link received:", url);
+
+        if (url.includes("#access_token") || url.includes("?access_token")) {
+          // Extrair tokens da URL
+          const urlParams = new URLSearchParams(
+            url.split("#")[1] || url.split("?")[1]
+          );
+          const accessToken = urlParams.get("access_token");
+          const refreshToken = urlParams.get("refresh_token");
+
+          if (accessToken) {
+            supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken || "",
+            });
+          }
+        }
+      };
+
+      const subscription = Linking.addEventListener("url", ({ url }) => {
+        handleDeepLink(url);
+      });
+
+      // Verificar URL inicial
+      Linking.getInitialURL().then((url) => {
+        if (url) handleDeepLink(url);
+      });
+
+      return () => {
+        subscription?.remove();
+      };
+    }
+  }, []);
+
   // Inicializar sessão
   useEffect(() => {
     setLoading(true);
@@ -81,6 +133,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state change:", event, session?.user?.email);
+
       setSession(session);
       setUser(session?.user ?? null);
 
@@ -158,28 +212,78 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log("Attempting Google OAuth sign-in...");
 
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo:
-            Platform.OS === "web" ? window.location.origin : undefined,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
+      if (Platform.OS === "web") {
+        // Web: usar redirecionamento padrão
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: getRedirectUrl(),
+            queryParams: {
+              access_type: "offline",
+              prompt: "consent",
+            },
           },
-        },
-      });
+        });
 
-      if (error) {
-        console.error("Google sign in error:", error);
-        const errorMessage = `Erro ao entrar com Google: ${error.message}`;
-        if (Platform.OS === "web") {
-          alert(errorMessage);
-        } else {
-          Alert.alert("Erro", errorMessage);
+        if (error) {
+          console.error("Google sign in error:", error);
+          alert(`Erro ao entrar com Google: ${error.message}`);
         }
       } else {
-        console.log("Google OAuth initiated successfully", data);
+        // Mobile: usar WebBrowser
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: getRedirectUrl(),
+            queryParams: {
+              access_type: "offline",
+              prompt: "consent",
+            },
+          },
+        });
+
+        if (error) {
+          console.error("Google sign in error:", error);
+          Alert.alert("Erro", `Erro ao entrar com Google: ${error.message}`);
+          return;
+        }
+
+        if (data.url) {
+          console.log("Opening OAuth URL:", data.url);
+
+          // Abrir o browser para autenticação
+          const result = await WebBrowser.openAuthSessionAsync(
+            data.url,
+            getRedirectUrl()
+          );
+
+          console.log("WebBrowser result:", result);
+
+          if (result.type === "success" && result.url) {
+            // Processar URL de retorno
+            const url = result.url;
+            if (
+              url.includes("#access_token") ||
+              url.includes("?access_token")
+            ) {
+              const urlParams = new URLSearchParams(
+                url.split("#")[1] || url.split("?")[1]
+              );
+
+              const accessToken = urlParams.get("access_token");
+              const refreshToken = urlParams.get("refresh_token");
+
+              if (accessToken) {
+                await supabase.auth.setSession({
+                  access_token: accessToken,
+                  refresh_token: refreshToken || "",
+                });
+              }
+            }
+          } else if (result.type === "cancel") {
+            console.log("OAuth cancelled by user");
+          }
+        }
       }
     } catch (error) {
       console.error("Google sign in error:", error);

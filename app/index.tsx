@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ActivityIndicator } from "react-native-paper";
 import { router } from "expo-router";
@@ -10,6 +10,9 @@ import StudyInput from "@/components/StudyInput";
 import StudyButton from "@/components/StudyButton";
 import { useAuth } from "@/hooks/useAuth";
 import { useStudy } from "@/hooks/useStudy";
+
+const { width: screenWidth } = Dimensions.get("window");
+const isWeb = screenWidth > 768;
 
 export default function HomeScreen() {
   const { user, loading: authLoading } = useAuth();
@@ -34,12 +37,18 @@ export default function HomeScreen() {
       <Header />
       <ScrollView
         style={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollContent,
+          isWeb && styles.webScrollContent,
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <StreakDisplay />
-        <WeeklyProgress />
-        <StudyInput />
-        <StudyButton />
+        <View style={[styles.content, isWeb && styles.webContent]}>
+          <StreakDisplay />
+          <WeeklyProgress />
+          <StudyInput />
+          <StudyButton />
+        </View>
         <View style={styles.bottomSpacing} />
       </ScrollView>
     </View>
@@ -59,6 +68,21 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  webScrollContent: {
+    paddingHorizontal: 0,
+    alignItems: "center",
+  },
+  content: {
+    width: "100%",
+  },
+  webContent: {
+    maxWidth: 600,
+    width: "100%",
+    paddingHorizontal: 20,
   },
   bottomSpacing: {
     height: 32,

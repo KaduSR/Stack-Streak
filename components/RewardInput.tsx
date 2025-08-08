@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { Text, TextInput, Button, Card } from "react-native-paper";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useStudy } from "@/hooks/useStudy";
+import { MaterialIcons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { Button, Card, Text, TextInput } from "react-native-paper";
 
 export default function RewardInput() {
-  const { stats, setTodayReward } = useStudy();
-  const [tempReward, setTempReward] = useState(stats.todayReward);
+  const { stats, setTodayRewardContent } = useStudy();
+  const [tempReward, setTempReward] = useState(stats.todayReward || "");
   const [isEditing, setIsEditing] = useState(!stats.todayReward);
 
   const handleSave = async () => {
@@ -44,6 +44,7 @@ export default function RewardInput() {
                 mode="outlined"
                 onPress={() => setIsEditing(false)}
                 style={styles.button}
+                disabled={isSaving}
               >
                 Cancelar
               </Button>
@@ -51,7 +52,8 @@ export default function RewardInput() {
                 mode="contained"
                 onPress={handleSave}
                 style={styles.button}
-                disabled={!tempReward.trim()}
+                disabled={!tempReward.trim() || isSaving}
+                loading={isSaving}
               >
                 Salvar
               </Button>

@@ -1,22 +1,25 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
-import { Text, Card } from "react-native-paper";
+import { useAuth } from "@/hooks/useAuth";
+import { useStudy } from "@/hooks/useStudy";
 import { MaterialIcons } from "@expo/vector-icons";
+import React from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
+import { Card, Text } from "react-native-paper";
 import Animated, {
-  useSharedValue,
   useAnimatedStyle,
-  withSpring,
+  useSharedValue,
   withRepeat,
   withSequence,
+  withSpring,
   withTiming,
 } from "react-native-reanimated";
-import { useStudy } from "@/hooks/useStudy";
-
 
 const AnimatedView = Animated.createAnimatedComponent(View);
+const { width: screenWidth } = Dimensions.get("window");
+const isWeb = screenWidth > 768;
 
 export default function StreakDisplay() {
   const { stats } = useStudy();
+  const { profile } = useAuth();
   const scale = useSharedValue(1);
   const rotate = useSharedValue(0);
 
@@ -47,7 +50,13 @@ export default function StreakDisplay() {
   };
 
   const getMotivationalText = () => {
-    if (stats.currentStreak === 0) return "Comece sua jornada!";
+    if (stats.todayCompleted && profile?.unique_reward) {
+      return `Continue assim, você está liberado para sua recompensa: "${profile.unique_reward}" 🎉`;
+    }
+    if (stats.currentStreak === 0 && stats.longestStreak > 0) {
+      return "Sua ofensiva foi interrompida! Hora de recomeçar forte! 💪";
+    }
+    if (stats.currentStreak === 0) return "Comece sua jornada de estudos!";
     if (stats.currentStreak === 1) return "Primeiro dia! Continue assim!";
     if (stats.currentStreak < 7) return "Você está no caminho certo!";
     if (stats.currentStreak < 30) return "Ofensiva impressionante!";
@@ -56,32 +65,48 @@ export default function StreakDisplay() {
   };
 
   return (
-    <Card style={styles.card}>
-      <View style={styles.content}>
+    <Card style={[styles.card, isWeb && styles.webCard]}>
+      <View style={[styles.content, isWeb && styles.webContent]}>
         <View style={styles.streakContainer}>
           <AnimatedView style={[styles.fireContainer, animatedStyle]}>
             <MaterialIcons
               name="local-fire-department"
-              size={60}
+              size={isWeb ? 80 : 60}
               color={getStreakColor()}
             />
           </AnimatedView>
 
-          <Text style={styles.streakNumber}>{stats.currentStreak}</Text>
-          <Text style={styles.streakLabel}>dias seguidos</Text>
+          <Text style={[styles.streakNumber, isWeb && styles.webStreakNumber]}>
+            {stats.currentStreak}
+          </Text>
+          <Text style={[styles.streakLabel, isWeb && styles.webStreakLabel]}>
+            dias seguidos
+          </Text>
         </View>
 
-        <Text style={styles.motivationalText}>{getMotivationalText()}</Text>
+        <Text
+          style={[styles.motivationalText, isWeb && styles.webMotivationalText]}
+        >
+          {getMotivationalText()}
+        </Text>
 
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.longestStreak}</Text>
-            <Text style={styles.statLabel}>Recorde</Text>
+        <View style={[styles.statsRow, isWeb && styles.webStatsRow]}>
+          <View style={[styles.statItem, isWeb && styles.webStatItem]}>
+            <Text style={[styles.statNumber, isWeb && styles.webStatNumber]}>
+              {stats.longestStreak}
+            </Text>
+            <Text style={[styles.statLabel, isWeb && styles.webStatLabel]}>
+              Recorde
+            </Text>
           </View>
 
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.totalStudyDays}</Text>
-            <Text style={styles.statLabel}>Total</Text>
+          <View style={[styles.statItem, isWeb && styles.webStatItem]}>
+            <Text style={[styles.statNumber, isWeb && styles.webStatNumber]}>
+              {stats.totalStudyDays}
+            </Text>
+            <Text style={[styles.statLabel, isWeb && styles.webStatLabel]}>
+              Total
+            </Text>
           </View>
         </View>
       </View>
@@ -95,9 +120,17 @@ const styles = StyleSheet.create({
     elevation: 4,
     backgroundColor: "#FFFFFF",
   },
+  webCard: {
+    margin: 20,
+    elevation: 6,
+    borderRadius: 16,
+  },
   content: {
     padding: 24,
     alignItems: "center",
+  },
+  webContent: {
+    padding: 32,
   },
   streakContainer: {
     alignItems: "center",
@@ -112,10 +145,17 @@ const styles = StyleSheet.create({
     color: "#58CC02",
     marginBottom: 4,
   },
+  webStreakNumber: {
+    fontSize: 64,
+    marginBottom: 8,
+  },
   streakLabel: {
     fontSize: 16,
     color: "#6B7280",
     fontWeight: "500",
+  },
+  webStreakLabel: {
+    fontSize: 18,
   },
   motivationalText: {
     fontSize: 18,
@@ -123,23 +163,43 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     marginBottom: 24,
+    lineHeight: 24,
+  },
+  webMotivationalText: {
+    fontSize: 20,
+    marginBottom: 32,
+    lineHeight: 28,
+    maxWidth: 500,
   },
   statsRow: {
     flexDirection: "row",
     justifyContent: "space-around",
     width: "100%",
   },
+  webStatsRow: {
+    gap: 60,
+  },
   statItem: {
     alignItems: "center",
+  },
+  webStatItem: {
+    minWidth: 100,
   },
   statNumber: {
     fontSize: 24,
     fontWeight: "bold",
     color: "#1CB0F6",
   },
+  webStatNumber: {
+    fontSize: 32,
+  },
   statLabel: {
     fontSize: 14,
     color: "#6B7280",
     marginTop: 4,
+  },
+  webStatLabel: {
+    fontSize: 16,
+    marginTop: 6,
   },
 });
