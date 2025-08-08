@@ -1,50 +1,144 @@
-# Welcome to your Expo app 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<h1 align="center">🚀 Stack Streak</h1>
 
-## Get started
+<p align="center">
+  Aplicativo pessoal para explorar do desenvolvimento front-end, utilizando <strong>React Native</strong> e <strong>Expo</strong>.
+</p>
 
-1. Install dependencies
+<p align="center">
+  <img alt="Status do Projeto" src="https://img.shields.io/badge/status-em%20construção-yellow" />
+  <img alt="React Native" src="https://img.shields.io/badge/React%20Native-0.79.5-blue" />
+  <img alt="Expo" src="https://img.shields.io/badge/Expo-~53.0.20-brightgreen" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-~5.8.3-blueviolet" />
+</p>
+
+---
+
+## 📚 Sobre o Projeto
+
+O **Stack Streak** é um projeto pessoal que nasceu da curiosidade em explorar como agentes de IA podem auxiliar e otimizar o desenvolvimento de aplicações. A ideia é criar uma plataforma de estudos funcional, construída com tecnologias modernas, enquanto testo os limites da automação e da assistência por IA no ciclo de desenvolvimento.
+
+Desenvolvido com **React Native + Expo**, o projeto visa entregar uma experiência de alta performance e multiplataforma, funcionando de forma nativa em **iOS**, **Android** e também na **Web**.
+
+---
+
+## 🚀 Primeiros Passos
+
+1. **Configure as Variáveis de Ambiente**
+
+   Este projeto utiliza o Supabase como backend e precisa de chaves de API para se conectar.
+
+   - Crie um arquivo chamado `.env` na raiz do projeto.
+   - Adicione as seguintes variáveis, substituindo pelos valores do seu projeto no Supabase:
+
+     ```env
+     EXPO_PUBLIC_SUPABASE_URL="https://your-project-url.supabase.co"
+     EXPO_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+     ```
+
+   > [!IMPORTANT]
+   > O prefixo `EXPO_PUBLIC_` é necessário para que as variáveis fiquem acessíveis no lado do cliente com o Expo.
+
+2. **Instale as dependências**
+
+   > [!NOTE]
+   > Este projeto utiliza `npm` como gerenciador de pacotes.
 
    ```bash
    npm install
    ```
 
-2. Start the app
+3. **Execute o projeto**
+
+   Após criar ou modificar o arquivo `.env`, é crucial reiniciar o servidor limpando o cache para que as novas variáveis sejam carregadas.
 
    ```bash
-   npx expo start
+   npm start -- -c  # Inicia o servidor Expo e limpa o cache
    ```
 
-In the output, you'll find options to open the app in a
+4. **Outros Comandos**
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   ```bash
+   npm run reset-project # Limpa o cache e reinstala os módulos
+   npm run lint
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 📁 Estrutura de Pastas
 
-When you're ready, run:
+A estrutura de pastas do projeto foi organizada para manter o código modular e de fácil manutenção.
 
-```bash
-npm run reset-project
+```
+.
+├── app/              # 📂 Rotas e telas gerenciadas pelo Expo Router
+├── assets/           # 🖼️ Imagens, fontes e outros arquivos estáticos
+├── components/       # 🧩 Componentes reutilizáveis da aplicação
+├── constants/        # 🎨 Cores, estilos e outras constantes globais
+├── hooks/            # 🎣 Hooks customizados do React
+├── lib/              # 🛠️ Funções utilitárias e clientes de API (ex: Supabase)
+└── scripts/          # 📜 Scripts de automação para o projeto
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 🧩 Principais Dependências
 
-To learn more about developing your project with Expo, look at the following resources:
+- **React Native**: `0.79.5`
+- **React**: `19.0.0`
+- **Expo**: `~53.0.20`
+- **Expo Router**: `~5.1.4`
+- **Supabase**: `^2.50.0`
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+📦 **Outras bibliotecas importantes:**
 
-## Join the community
+- `@expo/vector-icons`
+- `react-native-paper`
+- `react-native-calendars`
+- `lottie-react-native`
+- `react-native-webview`
 
-Join our community of developers creating universal apps.
+> Para a lista completa, consulte o arquivo `package.json`.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## 🛠️ Ferramentas de Desenvolvimento
+
+- **TypeScript**: `~5.8.3`
+- **ESLint**: `^9.25.0`
+- **Babel**: `@babel/core ^7.25.2`
+
+---
+
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Siga os passos abaixo:
+
+> [!TIP]
+> Para diretrizes mais detalhadas, incluindo nossas convenções de commit, consulte o nosso [**Guia de Contribuição**](CONTRIBUTING.md).
+
+1. Fork este repositório.
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`).
+3. Faça o commit das suas alterações (`git commit -m 'feat: Adiciona nova funcionalidade'`).
+4. Faça o push para a branch (`git push origin feature/nova-feature`).
+5. Abra um Pull Request.
+
+---
+
+## 📄 Licença
+
+Este projeto é privado (`"private": true`). Para colaborações ou uso do código, por favor, entre em contato.
+
+---
+
+## 📬 Contato
+
+Conecte-se comigo:
+
+🔗 [Linktree – Kadu Ribeiro](https://linktr.ee/KaduSR)
+
+---
+
+<p align="center">
+  Desenvolvido com 💡 e ☕ por <strong>Kadu Ribeiro</strong>
+</p>
