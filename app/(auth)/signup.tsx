@@ -29,7 +29,7 @@ export default function SignupScreen() {
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
+    if (formData.password != formData.confirmPassword) {
       return;
     }
 
@@ -139,7 +139,7 @@ export default function SignupScreen() {
               secureTextEntry={!showPassword}
               error={
                 formData.confirmPassword &&
-                formData.password !== formData.confirmPassword
+                formData.password != formData.confirmPassword
               }
             />
 

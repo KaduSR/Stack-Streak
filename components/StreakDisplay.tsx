@@ -12,6 +12,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useStudy } from "@/hooks/useStudy";
 
+
 const AnimatedView = Animated.createAnimatedComponent(View);
 
 export default function StreakDisplay() {
@@ -46,9 +47,6 @@ export default function StreakDisplay() {
   };
 
   const getMotivationalText = () => {
-    if (stats.todayCompleted && stats.todayReward) {
-      return "Continue assim, você está liberado para sua recompensa! 🎉";
-    }
     if (stats.currentStreak === 0) return "Comece sua jornada!";
     if (stats.currentStreak === 1) return "Primeiro dia! Continue assim!";
     if (stats.currentStreak < 7) return "Você está no caminho certo!";

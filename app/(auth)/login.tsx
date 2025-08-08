@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
-import { Text, TextInput, Button, Card, Divider } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth } from "@/hooks/useAuth";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
-import { useAuth } from "@/hooks/useAuth";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { Button, Card, Divider, Text, TextInput } from "react-native-paper";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
   const { signIn, signInWithGoogle, loading } = useAuth();
